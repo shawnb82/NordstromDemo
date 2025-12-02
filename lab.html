@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Product Recall Assistant Agent Lab Guide</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            color-scheme: light dark;
+            --bg: #0b1b33;
+            --bg-light: #f4f6fb;
+            --accent: #0063b1;
+            --text: #0f172a;
+            --text-light: #ffffff;
+            --border: rgba(15,23,42,0.12);
+        }
+        body {
+            margin: 0;
+            font-family: "Segoe UI", Arial, sans-serif;
+            background: var(--bg-light);
+            color: var(--text);
+            display: flex;
+            min-height: 100vh;
+        }
+        aside {
+            width: 280px;
+            background: var(--bg);
+            color: var(--text-light);
+            padding: 2rem 1.5rem;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            overflow-y: auto;
+        }
+        aside h1 {
+            font-size: 1.3rem;
+            margin: 0 0 1.5rem 0;
+        }
+        nav ul, nav li {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+        nav > ul > li {
+            margin-bottom: 0.6rem;
+        }
+        nav a {
+            color: inherit;
+            text-decoration: none;
+            display: block;
+            padding: 0.35rem 0.4rem;
+            border-radius: 6px;
+            transition: background 0.2s ease;
+        }
+        nav a:hover {
+            background: rgba(255,255,255,0.15);
+        }
+        nav ul ul {
+            margin-top: 0.25rem;
+            padding-left: 1rem;
+            border-left: 1px solid rgba(255,255,255,0.2);
+        }
+        main {
+            flex: 1;
+            padding: 2.5rem 3rem;
+            max-width: 960px;
+            margin: 0 auto;
+        }
+        header {
+            margin-bottom: 2rem;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 1rem;
+        }
+        header h2 {
+            margin: 0;
+            font-size: 2rem;
+            color: var(--accent);
+        }
+        section {
+            margin-bottom: 2.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+        section:last-of-type {
+            border-bottom: none;
+        }
+        h3 {
+            font-size: 1.6rem;
+            margin-top: 0;
+        }
+        h4 {
+            font-size: 1.2rem;
+            margin-bottom: 0.6rem;
+            color: var(--accent);
+        }
+        p {
+            line-height: 1.6;
+        }
+        ul {
+            margin: 0.6rem 0 1.2rem 1.2rem;
+        }
+        ol {
+            margin: 0.6rem 0 1.2rem 1.4rem;
+        }
+        li {
+            margin-bottom: 0.4rem;
+        }
+        pre {
+            background: #0f172a;
+            color: #f1f5f9;
+            padding: 1rem 1.2rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-size: 0.95rem;
+        }
+        code {
+            font-family: "Cascadia Code", "Fira Code", monospace;
+        }
+        .callout {
+            background: rgba(0,99,177,0.08);
+            border-left: 4px solid var(--accent);
+            padding: 1rem 1.2rem;
+            border-radius: 6px;
+            margin: 1rem 0 1.5rem 0;
+        }
+        @media (max-width: 960px) {
+            body { flex-direction: column; }
+            aside {
+                position: relative;
+                width: auto;
+                height: auto;
+                border-bottom: 1px solid rgba(255,255,255,0.2);
+            }
+            main { padding: 2rem; }
+        }
+    </style>
+</head>
+<body>
+    <aside>
+        <h1>Lab Navigation</h1>
+        <nav>
+            <ul>
+                <li><a href="#overview">Overview</a></li>
+                <li>
+                    <a href="#prerequisites">Prerequisites</a>
+                </li>
+                <li>
+                    <a href="#step-1">Step 1 · Gather the Knowledge Source</a>
+                </li>
+                <li>
+                    <a href="#step-2">Step 2 · Begin Creating the Agent</a>
+                    <ul>
+                        <li><a href="#agent-prompt">Agent Creation Prompt</a></li>
+                        <li><a href="#test-prompt-initial">Initial Test Prompt</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#step-3">Step 3 · Configure the Agent</a>
+                    <ul>
+                        <li><a href="#agent-name">Agent Name</a></li>
+                        <li><a href="#knowledge-source">Add Knowledge Source</a></li>
+                        <li><a href="#test-prompt-configured">Retest Prompt</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#step-4">Step 4 · Fine Tune the Agent</a>
+                    <ul>
+                        <li><a href="#model-selection">Model Selection</a></li>
+                        <li><a href="#create-topic">Create a Topic</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#step-5">Step 5 · Evaluate Your Agent</a>
+                </li>
+                <li>
+                    <a href="#step-6">Step 6 · Publish the Agent</a>
+                </li>
+            </ul>
+        </nav>
+    </aside>
+
+    <main>
+        <header>
+            <h2>Product Recall Assistant Agent Lab Guide</h2>
+            <p>Follow this lab to build a Product Recall Assistant in Copilot Studio that helps consumers find recall details quickly.</p>
+        </header>
+
+        <section id="overview">
+            <h3>Objective</h3>
+            <p>Create a Copilot Studio agent that surfaces recall data for consumers, grounded entirely in a CSV knowledge source.</p>
+        </section>
+
+        <section id="prerequisites">
+            <h3>Prerequisites</h3>
+            <ul>
+                <li>General knowledge of AI agents</li>
+                <li>Access to Copilot Studio</li>
+                <li>CSV download of <a href="https://www.cpsc.gov/Recalls" target="_blank" rel="noopener">Recalls &amp; Product Safety Warnings</a>.</li>
+            </ul>
+        </section>
+
+        <section id="step-1">
+            <h3>Step 1 · Gather the Knowledge Source</h3>
+            <ol>
+                <li>Open <a href="https://www.cpsc.gov/Recalls" target="_blank" rel="noopener">https://www.cpsc.gov/Recalls</a>.</li>
+                <li>Select <strong>Export CSV</strong>, set a date range (e.g., 12/2/2024 – 12/2/2025), then choose <strong>Apply</strong>.</li>
+                <img src="https://shawnb82.github.io/NordstromDemo/Picture1.png">
+                <li>Download the CSV, save it to OneDrive, and note the path for later use.</li>
+                <li>Review the CSV structure to understand the recall information it provides.</li>
+            </ol>
+        </section>
+
+        <section id="step-2">
+            <h3>Step 2 · Begin Creating the Agent</h3>
+            <ol>
+                <li>Navigate to <a href="https://copilotstudio.microsoft.com" target="_blank" rel="noopener">https://copilotstudio.microsoft.com</a>.</li>
+                <li>Sign in with your M365 work account as required.</li>
+                <li>Select <strong>Create</strong> &gt; <strong>+ New agent</strong></li><img src="https://shawnb82.github.io/NordstromDemo/Picture2.png">
+                <li>Paste the agent creation prompt provided below.</li>
+                <li>Test with the sample prompt in the right pane.</li>
+            </ol>
+
+            <div id="agent-prompt" class="callout">
+                <h4>Agent Creation Prompt <button type="button" class="copy-button" aria-label="Copy agent creation prompt">Copy</button></h4>
+                <pre><code id="agent-prompt-code">-Serve as an assistant for consumers to find product recall information.
+-Use only the provided knowledge source.
+-Do not use general model knowledge, external websites, or prior memory.
+-Answer only if a specific section/document from the knowledge source can be cited.
+-If the answer cannot be found in the knowledge source, respond: “I’m sorry, the information is not available in the provided recall list.”
+-Decline questions unrelated to product recalls or outside the scope.
+-Present results in a clear and concise table displaying in the format [Recall #, Date, Name of Product, Remedy Type, Sold At, Manufactured In]. Retrieve the data from the knowledge source that matches the columns specified.
+-Summarize the information in the knowledge source so that the output is more succinct. Keep the information in each column to 1-2 sentences.
+-Be concise, professional, and only answer in English.
+-Include relevant details as presented in the source.
+-Do not generate creative content, hypotheticals, or assumptions.</code></pre>
+                <script>
+                    (() => {
+                        const button = document.querySelector('#agent-prompt .copy-button');
+                        const code = document.getElementById('agent-prompt-code');
+                        if (button && code) {
+                            button.addEventListener('click', async () => {
+                                await navigator.clipboard.writeText(code.innerText.trim());
+                                const original = button.textContent;
+                                button.textContent = 'Copied!';
+                                setTimeout(() => (button.textContent = original), 2000);
+                            });
+                        }
+                    })();
+                </script>
+            </div>
+            
+        <ol><img src="https://shawnb82.github.io/NordstromDemo/Picture3.png">
+        </ol>
+
+            <div id="test-prompt-initial" class="callout">
+                <h4>Initial Test Prompt <button type="button" class="copy-button" aria-label="Copy initial test prompt">Copy</button></h4>
+                <pre><code id="test-prompt-initial-code">Show me recalls for products that were manufactured in Vietnam</code></pre>
+                <script>
+                    (() => {
+                        const button = document.querySelector('#test-prompt-initial .copy-button');
+                        const code = document.getElementById('test-prompt-initial-code');
+                        if (button && code) {
+                            button.addEventListener('click', async () => {
+                                await navigator.clipboard.writeText(code.innerText.trim());
+                                const original = button.textContent;
+                                button.textContent = 'Copied!';
+                                setTimeout(() => (button.textContent = original), 2000);
+                            });
+                        }
+                    })();
+                </script>
+            </div>
+        </section>
+
+        <section id="step-3">
+            <h3>Step 3 · Configure the Agent</h3>
+            <ol>
+                <li>Open the <strong>Configure</strong> tab.</li>
+                <li id="agent-name">Set the agent name to <strong>Product Recall Assistant</strong>.</li>
+                <li id="knowledge-source">Add the knowledge source:
+                    <ol>
+                        <li>Select <strong>+ Add</strong> under <strong>Knowledge</strong>.</li>
+                        <img src="https://shawnb82.github.io/NordstromDemo/Picture4.png">
+                        <li>Choose <strong>SharePoint</strong>, then paste the CSV share link from OneDrive.</li>
+                        <li>Click <strong>Add</strong>, then <strong>Add to agent</strong>.</li>
+                        <img src="https://shawnb82.github.io/NordstromDemo/Picture5.png">
+                    </ol>
+                </li>
+                <li>Disable <strong>Web search</strong> under Knowledge.</li>
+                <img src="https://shawnb82.github.io/NordstromDemo/Picture6.png">
+                <li id="test-prompt-configured">Retest with the same prompt used in Step 2 and compare the grounded response.</li>
+                <li>Review and adjust the Description, Instructions, and Suggested Prompts generated.</li>
+                <li>Select <strong>Create</strong> to build the agent.</li><img src="https://shawnb82.github.io/NordstromDemo/Picture7.png">
+            </ol>
+        </section>
+
+        <section id="step-4">
+            <h3>Step 4 · Fine Tune the Agent</h3>
+            <div id="model-selection">
+                <h4>Select the Agent Model</h4>
+                <ul>
+                    <li>Choose among available OpenAI or Anthropic models.</li>
+                    <img src="https://shawnb82.github.io/NordstromDemo/Picture8.png">
+                    <li>Test after each selection. For this lab, GPT-4.1 is recommended.</li>
+                </ul>
+            </div>
+            <div id="create-topic">
+            <h4>Add Additional Instructions</h4>
+                <li>Add instructions to provide more info when requested by a user.</li>
+                <li>Open the <strong>Overview</strong> tab, click <strong>Edit</strong>, and paste the prompt below at the end of the current instructions. Press <strong>Save</strong> after you finish.</li>
+            
+            <li>Test the new <strong>More info</strong> functionality by prompting the agent for additional information after it returns initial results.</li>
+            <h4>Create an agent Tool (Optional)</h4>
+            <li>Navigate to the <strong>Tools</strong> tab.</li>
+            <li>Select <strong>+Add a tool</strong>, then choose the <em>Prompt</em> tool type and press <strong>+New tool</strong> </li>
+            <img src="https://shawnb82.github.io/NordstromDemo/Picture9.png">
+            <li>Select the <em>Prompt</em> tool type again and enter the following instructions for this tool:</li>
+            <div class="callout tool-copy" id="thank-you-logo-tool">
+                <h4>Thank You Logo Tool instructions <button type="button" data-copy-target="thank-you-logo-tool-code" aria-label="Copy thank you logo prompt">Copy</button></h4>
+                <pre><code id="thank-you-logo-tool-code">You are tasked with creating a thank you logo using ASCII art.
+
+Instructions:
+1. Design a visually appealing "Thank You" logo using ASCII characters.
+2. Ensure the design clearly conveys the message "Thank You" in a creative and artistic manner.
+3. Use only ASCII characters to form the logo; avoid any non-ASCII symbols or images.
+4. The logo must be suitable for display in plain text environments such as terminals or text files.
+5. Keep the design balanced and readable, considering spacing and alignment.
+
+Guidelines:
+- Focus on clarity and creativity.
+- Avoid overly complex designs that reduce readability.
+- The output should be a plain text representation of the ASCII art logo.
+
+Output Format:
+Provide the ASCII art logo as plain text.</code></pre>
+            </div>
+            <script>
+            (() => {
+                const btn = document.querySelector('[data-copy-target="thank-you-logo-tool-code"]');
+                if (!btn) return;
+                btn.addEventListener('click', async () => {
+                    const target = document.getElementById(btn.dataset.copyTarget);
+                    if (!target) return;
+                    await navigator.clipboard.writeText(target.innerText.trim());
+                    const previous = btn.textContent;
+                    btn.textContent = 'Copied!';
+                    setTimeout(() => { btn.textContent = previous; }, 2000);
+                });
+            })();
+            </script>
+            </div>
+            <li>Give the tool a name like <strong>Thank You Logo Tool</strong> and <strong>Save</strong> it.</li>
+            <img src="https://shawnb82.github.io/NordstromDemo/Picture13.png">
+            <li>Add the newly created Tool to your agent by browsing to the Agent's Overview page, and clicking <strong>Edit</strong> under <strong>Instructions</strong>.</li>
+            <li>Add the following instructions at the end of the existing instructions:</li>
+
+            <div class="callout tool-copy" id="agent-extra-instruction">
+                <h4>Additional Instruction <button type="button" data-copy-target="agent-extra-instruction-code" aria-label="Copy additional instruction">Copy</button></h4>
+                <pre><code id="agent-extra-instruction-code">-At the end of the interaction, ask if the user needs anything else. If they answer 'no', then run /Thank you logo</code></pre>
+            </div>
+            <script>
+            (() => {
+                const trigger = document.querySelector('[data-copy-target="agent-extra-instruction-code"]');
+                if (!trigger) return;
+                trigger.addEventListener('click', async () => {
+                    const source = document.getElementById('agent-extra-instruction-code');
+                    if (!source) return;
+                    await navigator.clipboard.writeText(source.innerText.trim());
+                    const previous = trigger.textContent;
+                    trigger.textContent = 'Copied!';
+                    setTimeout(() => { trigger.textContent = previous; }, 2000);
+                });
+            })();
+            </script>
+            <li>Save the changes to the agent.</li>
+        </section>
+
+        <section id="step-5">
+            <h3>Step 5 · Evaluate Your Agent</h3>
+            <ol>
+                <li>Go to the <strong>Evaluation</strong> tab and select <strong>Create a test set</strong>.</li>
+                <li>Choose <strong>Generate 10 questions</strong>.</li>
+                <li>Run the evaluation using the generated test set.</li>
+                <li>Sign in with an authenticated account if prompted for better evaluation results.</li>
+                <img src="https://shawnb82.github.io/NordstromDemo/Picture10.png">
+                <li>Review the report once the evaluation completes to understand accuracy and gaps.</li>
+                <img src="https://shawnb82.github.io/NordstromDemo/Picture11.png">
+            </ol>
+        </section>
+
+        <section id="step-6">
+            <h3>Step 6 · Publish the Agent (Optional)</h3>
+            <ol>
+                <li>Open the <strong>Channels</strong> tab.</li>
+                <li>Select channels such as <strong>Teams</strong> and <strong>Microsoft 365 Copilot</strong>, then choose <strong>Add channel</strong>.</li>
+                <img src="https://shawnb82.github.io/NordstromDemo/Picture12.png">
+                <li>Confirm by selecting <strong>Publish</strong>.</li>
+                <li>After publishing, visit <a href="https://m365copilot.com" target="_blank" rel="noopener">https://m365copilot.com</a> to confirm the <em>Product Recall Assistant</em> appears in your agent list.</li>
+            </ol>
+            <p class="callout">Tip: Additional channels can be added later once the agent is published.</p>
+        </section>
+    </main>
+</body>
+
+</html>
