@@ -310,7 +310,36 @@
                 <h4>Add Additional Instructions</h4>
                 <li>Add instructions to provide more info when requested by a user.</li>
                 <li>Open the <strong>Overview</strong> tab, click <strong>Edit</strong>, and paste the prompt below at the end of the current instructions. Press <strong>Save</strong> after you finish.</li>
-            
+                
+            <div class="callout tool-copy" id="more-info-instruction">
+                <h4>More Info Instruction <button type="button" data-copy-target="more-info-instruction-code" aria-label="Copy more info instruction">Copy</button></h4>
+                <pre><code id="more-info-instruction-code">-After you return the initial results, if the user asks for more information. Perform the instructions below: 
+
+### Instructions:
+1. When a user requests more information about a specific recall, prompt the user to provide the recall number.
+2. Use the provided recall number to retrieve the following details from the knowledge source:   - Recall Heading   - Name of Product   - Description   - Hazard Description   - Consumer Action
+3. Present the retrieved information in a table with the following columns:   - Recall #   - Recall Heading   - Name of Product   - Desc   - Hazard Desc   - Consumer Action 
+
+### Guidelines:
+- Ensure the recall number is clearly requested and confirmed before retrieving data.
+- Extract only the specified fields from the knowledge source.
+- Format the output as a clear and concise table for easy reading.
+- If the recall number is invalid or not found, politely inform the user and ask for a valid recall number.</code></pre>
+            </div>
+            <script>
+            (() => {
+                const trigger = document.querySelector('[data-copy-target="more-info-instruction-code"]');
+                if (!trigger) return;
+                trigger.addEventListener('click', async () => {
+                    const source = document.getElementById('more-info-instruction-code');
+                    if (!source) return;
+                    await navigator.clipboard.writeText(source.innerText.trim());
+                    const previous = trigger.textContent;
+                    trigger.textContent = 'Copied!';
+                    setTimeout(() => { trigger.textContent = previous; }, 2000);
+                });
+            })();
+            </script>
             <li>Test the new <strong>More info</strong> functionality by prompting the agent for additional information after it returns initial results.</li>
             <h4>Create an agent Tool (Optional)</h4>
             <li>Navigate to the <strong>Tools</strong> tab.</li>
